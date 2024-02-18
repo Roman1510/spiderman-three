@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { Canvas as CanvasThree } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
 
 interface ICanvasProps {
   children?: ReactNode
@@ -8,8 +9,8 @@ interface ICanvasProps {
 const Canvas = ({ children }: ICanvasProps) => {
   return (
     <CanvasThree>
-      <ambientLight />
-      <pointLight position={[10, 10, 10]} />
+      <OrbitControls />
+
       {children}
     </CanvasThree>
   )
