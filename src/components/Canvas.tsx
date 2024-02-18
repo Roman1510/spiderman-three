@@ -8,7 +8,7 @@ interface ICanvasProps {
 
 const Canvas = ({ children }: ICanvasProps) => {
   return (
-    <CanvasThree>
+    <CanvasThree shadows>
       <OrbitControls />
       {children}
     </CanvasThree>

@@ -43,12 +43,27 @@ export default function Spiderman() {
   ]
 
   // Leva controls for animations
+  const { timeScale } = useControls('SPeed', {
+    timeScale: {
+      value: 1,
+      min: 0,
+      max: 3,
+      step: 0.1,
+      label: 'Time Scale',
+    },
+  })
 
+  useEffect(() => {
+    Object.values(actions).forEach((action) => {
+      action!.setEffectiveTimeScale(timeScale)
+    })
+  }, [actions, timeScale])
   animationNames.forEach((name) => {
     useControls('player controls', {
       [name]: {
         value: false,
         label: name,
+
         onChange: (value) => handleAnimationPlay(name, value),
       },
     })
@@ -157,12 +172,6 @@ export default function Spiderman() {
                       geometry={(nodes.Object_159 as SkinnedMesh).geometry}
                       material={materials.manhole}
                       skeleton={(nodes.Object_159 as SkinnedMesh).skeleton}
-                    />
-                    <skinnedMesh
-                      name="Object_161"
-                      geometry={(nodes.Object_161 as SkinnedMesh).geometry}
-                      material={materials.hero_spiderman01_s08_wp}
-                      skeleton={(nodes.Object_161 as SkinnedMesh).skeleton}
                     />
                   </group>
                 </group>
