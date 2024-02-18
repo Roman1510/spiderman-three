@@ -10,7 +10,6 @@ const Canvas = ({ children }: ICanvasProps) => {
   return (
     <CanvasThree>
       <OrbitControls />
-
       {children}
     </CanvasThree>
   )

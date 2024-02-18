@@ -7,15 +7,61 @@ Source: https://sketchfab.com/3d-models/spider-man-spider-man-no-way-home-2cb11e
 Title: Spider-man (Spider-man: No way Home)
 */
 
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { Group, SkinnedMesh } from 'three'
+import { useControls } from 'leva'
 
 export default function Spiderman() {
   const group = useRef<Group>(null)
   const { nodes, materials, animations } = useGLTF('/spiderman.glb')
   const { actions } = useAnimations(animations, group)
-  console.log(actions, 'available actions')
+
+  console.log(actions)
+
+  // Define the animation names
+  const animationNames = [
+    'Armature|Armature|hero_spiderman01_S08@atk-01|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@atk-02|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@dash|Base Layer', //dash with shift
+    'Armature|Armature|hero_spiderman01_S08@die|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@hit|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@idle|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@skill01|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@skill02|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@skill03|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@skill04|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@skill05-01|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@skill05-02|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@skill05-03|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@skill06_cam|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@skill06|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@stun|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@succ_cam|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@wait|Base Layer',
+    'Armature|Armature|hero_spiderman01_S08@walk|Base Layer', //normal walk with WASD
+  ]
+
+  // Leva controls for animations
+
+  animationNames.forEach((name) => {
+    useControls('player controls', {
+      [name]: {
+        value: false,
+        label: name,
+        onChange: (value) => handleAnimationPlay(name, value),
+      },
+    })
+  })
+
+  const handleAnimationPlay = (name: string, play: boolean) => {
+    if (play) {
+      actions[name]?.reset().play()
+    } else {
+      actions[name]?.stop()
+    }
+  }
+
   return (
     <group ref={group} dispose={null}>
       <group name="Sketchfab_Scene">

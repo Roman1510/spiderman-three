@@ -8,7 +8,7 @@ export default function Scene({ children }: PropsWithChildren) {
     pointLightPositionX,
     pointLightPositionY,
     pointLightPositionZ,
-  } = useControls({
+  } = useControls('Scene settings', {
     ambientLightIntensity: {
       value: 10,
       min: 0,
@@ -57,14 +57,11 @@ export default function Scene({ children }: PropsWithChildren) {
         ]}
         intensity={pointLightIntensity}
       />
-      <gridHelper args={[100]} />
-      {/* Gray Plane */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]} // Rotate the plane to be horizontal
-        position={[0, 0, 0]} // Position it at the ground level
-      >
-        <planeGeometry args={[100, 100]} /> {/* Size of the plane */}
-        <meshStandardMaterial color={'gray'} /> {/* Gray color */}
+      <gridHelper args={[1000]} />
+
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+        <planeGeometry args={[1000, 1000]} />
+        <meshStandardMaterial color={'gray'} />
       </mesh>
       {children}
     </>
