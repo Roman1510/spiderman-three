@@ -9,8 +9,10 @@ Title: Spider-man (Spider-man: No way Home)
 
 import { useEffect, useRef } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
-import { Group, SkinnedMesh } from 'three'
+import { Group, SkinnedMesh, Vector3 } from 'three'
 import { useControls } from 'leva'
+import { useFrame } from '@react-three/fiber'
+import useControlsChar from '../hooks/useControls'
 
 export default function Spiderman() {
   const group = useRef<Group>(null)
@@ -76,6 +78,33 @@ export default function Spiderman() {
       actions[name]?.stop()
     }
   }
+
+  const { forward, backward, left, right } = useControlsChar()
+  useFrame(() => {
+    if (!group.current) return
+
+    const speed = 0.1 // Adjust speed as needed
+    // Directly create a new Vector3 for direction, initially set to 0, 0, 0
+    const direction = new Vector3(0, 0, 0)
+
+    // Adjust direction based on keypresses, modifying X and Z directly
+    if (backward) {
+      direction.z -= speed // Move forward along the global Z axis
+    }
+    if (forward) {
+      direction.z += speed // Move backward along the global Z axis
+    }
+    if (right) {
+      direction.x -= speed // Move left along the global X axis
+    }
+    if (left) {
+      direction.x += speed // Move right along the global X axis
+    }
+
+    // Update the position of the character by adding the direction vector
+    // This assumes the Y-axis is up and you're moving on the X/Z plane
+    group.current.position.add(direction)
+  })
 
   return (
     <group ref={group} dispose={null}>
