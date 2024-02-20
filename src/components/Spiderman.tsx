@@ -80,29 +80,33 @@ export default function Spiderman() {
   }
 
   const { forward, backward, left, right } = useControlsChar()
-  useFrame(() => {
+  useFrame((_state, delta) => {
     if (!group.current) return
 
-    const speed = 0.1 // Adjust speed as needed
-    // Directly create a new Vector3 for direction, initially set to 0, 0, 0
+    const speed = delta / 1000 // Adjust speed as needed
     const direction = new Vector3(0, 0, 0)
 
-    // Adjust direction based on keypresses, modifying X and Z directly
-    if (backward) {
-      direction.z -= speed // Move forward along the global Z axis
-    }
-    if (forward) {
-      direction.z += speed // Move backward along the global Z axis
-    }
-    if (right) {
-      direction.x -= speed // Move left along the global X axis
-    }
-    if (left) {
-      direction.x += speed // Move right along the global X axis
+    // Adjust direction based on keypresses
+    if (backward) direction.z -= speed
+    if (forward) direction.z += speed
+    if (right) direction.x -= speed
+    if (left) direction.x += speed
+
+    // Only rotate the model if there's some direction of movement
+    if (direction.lengthSq() > 0) {
+      // Normalize the direction vector (to have a unit length)
+      direction.normalize()
+
+      // Calculate the angle to rotate towards. Assuming the forward direction is along the negative Z-axis
+      // Note: In Three.js, the positive Z-axis points out of the screen, so you might need to adjust this logic based on your model's initial orientation
+      const angle = Math.atan2(direction.x, direction.z)
+
+      // Rotate the model to face the direction of movement
+      // This sets the Y rotation directly, but you could also use slerp or lerp for smoother transitions
+      group.current.rotation.y = angle
     }
 
-    // Update the position of the character by adding the direction vector
-    // This assumes the Y-axis is up and you're moving on the X/Z plane
+    // Update the position of the character
     group.current.position.add(direction)
   })
 
