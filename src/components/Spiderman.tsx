@@ -83,35 +83,30 @@ export default function Spiderman() {
   useFrame((_state, delta) => {
     if (!group.current) return
 
-    const speed = delta / 1000 // Adjust speed as needed
+    const baseSpeed = 10
+
+    const adjustedSpeed = baseSpeed * delta
+
     const direction = new Vector3(0, 0, 0)
 
-    // Adjust direction based on keypresses
-    if (backward) direction.z -= speed
-    if (forward) direction.z += speed
-    if (right) direction.x -= speed
-    if (left) direction.x += speed
+    if (backward) direction.z += adjustedSpeed
+    if (forward) direction.z -= adjustedSpeed
+    if (right) direction.x += adjustedSpeed
+    if (left) direction.x -= adjustedSpeed
 
-    // Only rotate the model if there's some direction of movement
     if (direction.lengthSq() > 0) {
-      // Normalize the direction vector (to have a unit length)
       direction.normalize()
 
-      // Calculate the angle to rotate towards. Assuming the forward direction is along the negative Z-axis
-      // Note: In Three.js, the positive Z-axis points out of the screen, so you might need to adjust this logic based on your model's initial orientation
       const angle = Math.atan2(direction.x, direction.z)
 
-      // Rotate the model to face the direction of movement
-      // This sets the Y rotation directly, but you could also use slerp or lerp for smoother transitions
       group.current.rotation.y = angle
     }
 
-    // Update the position of the character
     group.current.position.add(direction)
   })
 
   return (
-    <group ref={group} dispose={null}>
+    <group scale={10} ref={group} dispose={null}>
       <group name="Sketchfab_Scene">
         <group
           name="Sketchfab_model"
