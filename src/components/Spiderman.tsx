@@ -7,7 +7,7 @@ Source: https://sketchfab.com/3d-models/spider-man-spider-man-no-way-home-2cb11e
 Title: Spider-man (Spider-man: No way Home)
 */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { Group, SkinnedMesh, Vector3 } from 'three'
 import { useControls } from 'leva'
@@ -18,7 +18,7 @@ export default function Spiderman() {
   const group = useRef<Group>(null)
   const { nodes, materials, animations } = useGLTF('/spiderman.glb')
   const { actions } = useAnimations(animations, group)
-
+  const [isMoving, setIsMoving] = useState(false)
   console.log(actions)
 
   // Define the animation names
@@ -103,6 +103,18 @@ export default function Spiderman() {
     }
 
     group.current.position.add(direction)
+
+    if (!isMoving && direction.lengthSq() > 0) {
+      // If not previously moving, and now there is movement
+      setIsMoving(true) // Update state to indicate movement has started
+      actions['Armature|Armature|hero_spiderman01_S08@walk|Base Layer']
+        ?.reset()
+        .play() // Play walking animation
+    } else if (isMoving && direction.lengthSq() === 0) {
+      // If previously moving, but now there's no movement
+      setIsMoving(false) // Update state to indicate movement has stopped
+      actions['Armature|Armature|hero_spiderman01_S08@walk|Base Layer']?.stop() // Stop walking animation
+    }
   })
 
   return (
