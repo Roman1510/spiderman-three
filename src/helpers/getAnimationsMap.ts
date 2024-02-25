@@ -2,18 +2,18 @@ import { useRef } from 'react'
 import { useAnimations } from '@react-three/drei'
 import { AnimationAction, AnimationClip, Group, LoopRepeat } from 'three'
 
-type AnimationMapReturn = {
-  playAnimation: (name: string, duration?: number) => void
-}
-
-const useAnimationMap = (
+const getAnimationsMap = (
   animations: AnimationClip[],
   groupRef: React.RefObject<Group>
-): AnimationMapReturn => {
+) => {
   const { actions } = useAnimations(animations, groupRef)
   const previousActionRef = useRef<AnimationAction | null>(null)
 
-  const playAnimation = (name: string, duration: number = 0.1) => {
+  const playAnimation = (
+    name: string,
+    transitionDuration: number = 0.1,
+    duration?: number
+  ) => {
     const currentActionName = `Armature|Armature|hero_spiderman01_S08@${name}|Base Layer`
     const currentAction = actions[currentActionName]
 
@@ -23,6 +23,22 @@ const useAnimationMap = (
     }
     // set the current action to loop always
     currentAction.setLoop(LoopRepeat, Infinity)
+
+    if (duration) {
+      // Calculate timeScale based on original animation duration and desired duration
+      const clipDuration = currentAction.getClip().duration
+      const timeScale = clipDuration / duration
+      currentAction.timeScale = timeScale
+
+      // When the animation is clamped, it will stop at the end of its duration
+      currentAction.clampWhenFinished = true
+      currentAction.loop = LoopRepeat
+    } else {
+      // Reset to default if no specific duration is set
+      currentAction.timeScale = 1
+      currentAction.clampWhenFinished = false
+    }
+
     if (
       previousActionRef.current &&
       previousActionRef.current !== currentAction
@@ -32,7 +48,7 @@ const useAnimationMap = (
       prevAction.enabled = true
       currentAction.reset()
       currentAction.play()
-      prevAction.crossFadeTo(currentAction, duration, true)
+      prevAction.crossFadeTo(currentAction, transitionDuration, true)
     } else if (!previousActionRef.current) {
       // if there's no previous action, simply play the current action
       currentAction.reset()
@@ -45,4 +61,4 @@ const useAnimationMap = (
   return { playAnimation }
 }
 
-export default useAnimationMap
+export default getAnimationsMap

@@ -37,6 +37,8 @@ export default function Spiderman() {
       action!.setEffectiveTimeScale(timeScale)
     })
   }, [actions, timeScale])
+
+  // Adjust Leva panel controls for animations
   animationNames.forEach((fullName) => {
     const name = fullName.slice(39, 52)
     useControls('animations', {
@@ -48,13 +50,18 @@ export default function Spiderman() {
     })
   })
 
-  const handleAnimationPlay = (name: string, play: boolean) => {
+  const handleAnimationPlay = (fullName: string, play: boolean) => {
+    // Stop all animations first
+    Object.values(actions).forEach((action) => {
+      action!.stop()
+    })
+
+    // Play the selected animation
     if (play) {
-      actions[name]?.reset().play()
-    } else {
-      actions[name]?.stop()
+      actions[fullName]?.reset().play()
     }
   }
+
   //}
   return (
     <group scale={10} ref={group} dispose={null}>
