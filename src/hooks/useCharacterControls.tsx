@@ -72,10 +72,10 @@ const useCharacterControls = (
     const speed = dash ? 2.5 : 1
     const direction = new Vector3()
 
-    if (moveForward) direction.z -= 1
-    if (moveBackward) direction.z += 1
-    if (moveLeft) direction.x -= 1
-    if (moveRight) direction.x += 1
+    if (moveForward) direction.z += 1
+    if (moveBackward) direction.z -= 1
+    if (moveLeft) direction.x += 1
+    if (moveRight) direction.x -= 1
 
     direction.normalize().multiplyScalar(speed)
     if (direction.length() > 0) {
