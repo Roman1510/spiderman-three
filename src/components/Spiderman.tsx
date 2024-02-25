@@ -7,45 +7,22 @@ Source: https://sketchfab.com/3d-models/spider-man-spider-man-no-way-home-2cb11e
 Title: Spider-man (Spider-man: No way Home)
 */
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
-import { Group, SkinnedMesh, Vector3 } from 'three'
+import { Group, SkinnedMesh } from 'three'
 import { useControls } from 'leva'
-import { useFrame } from '@react-three/fiber'
-import useControlsChar from '../hooks/useControls'
+import { animationNames } from '../consts/animations'
+import useCharacterControls from '../hooks/useCharacterControls'
 
 export default function Spiderman() {
   const group = useRef<Group>(null)
   const { nodes, materials, animations } = useGLTF('/spiderman.glb')
   const { actions } = useAnimations(animations, group)
-  const [isMoving, setIsMoving] = useState(false)
-  console.log(actions)
 
-  // Define the animation names
-  const animationNames = [
-    'Armature|Armature|hero_spiderman01_S08@atk-01|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@atk-02|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@dash|Base Layer', //dash with shift
-    'Armature|Armature|hero_spiderman01_S08@die|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@hit|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@idle|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@skill01|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@skill02|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@skill03|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@skill04|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@skill05-01|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@skill05-02|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@skill05-03|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@skill06_cam|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@skill06|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@stun|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@succ_cam|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@wait|Base Layer',
-    'Armature|Armature|hero_spiderman01_S08@walk|Base Layer', //normal walk with WASD
-  ]
+  useCharacterControls(group, animations)
 
-  // Leva controls for animations
-  const { timeScale } = useControls('SPeed', {
+  //debug{
+  const { timeScale } = useControls('Speed', {
     timeScale: {
       value: 1,
       min: 0,
@@ -60,13 +37,13 @@ export default function Spiderman() {
       action!.setEffectiveTimeScale(timeScale)
     })
   }, [actions, timeScale])
-  animationNames.forEach((name) => {
-    useControls('player controls', {
-      [name]: {
+  animationNames.forEach((fullName) => {
+    const name = fullName.slice(39, 52)
+    useControls('animations', {
+      [fullName]: {
         value: false,
         label: name,
-
-        onChange: (value) => handleAnimationPlay(name, value),
+        onChange: (value) => handleAnimationPlay(fullName, value),
       },
     })
   })
@@ -78,45 +55,7 @@ export default function Spiderman() {
       actions[name]?.stop()
     }
   }
-
-  const { forward, backward, left, right } = useControlsChar()
-  useFrame((_state, delta) => {
-    if (!group.current) return
-
-    const baseSpeed = 10
-
-    const adjustedSpeed = baseSpeed * delta
-
-    const direction = new Vector3(0, 0, 0)
-
-    if (backward) direction.z += adjustedSpeed
-    if (forward) direction.z -= adjustedSpeed
-    if (right) direction.x += adjustedSpeed
-    if (left) direction.x -= adjustedSpeed
-
-    if (direction.lengthSq() > 0) {
-      direction.normalize()
-
-      const angle = Math.atan2(direction.x, direction.z)
-
-      group.current.rotation.y = angle
-    }
-
-    group.current.position.add(direction)
-
-    if (!isMoving && direction.lengthSq() > 0) {
-      // If not previously moving, and now there is movement
-      setIsMoving(true) // Update state to indicate movement has started
-      actions['Armature|Armature|hero_spiderman01_S08@walk|Base Layer']
-        ?.reset()
-        .play() // Play walking animation
-    } else if (isMoving && direction.lengthSq() === 0) {
-      // If previously moving, but now there's no movement
-      setIsMoving(false) // Update state to indicate movement has stopped
-      actions['Armature|Armature|hero_spiderman01_S08@walk|Base Layer']?.stop() // Stop walking animation
-    }
-  })
-
+  //}
   return (
     <group scale={10} ref={group} dispose={null}>
       <group name="Sketchfab_Scene">

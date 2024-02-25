@@ -57,11 +57,10 @@ export default function Scene({ children }: PropsWithChildren) {
         ]}
         intensity={pointLightIntensity}
       />
-      <gridHelper args={[1000]} />
 
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[1000, 1000]} />
-        <meshStandardMaterial color={'gray'} />
+        <meshStandardMaterial color={'grey'} />
       </mesh>
       {children}
     </>
