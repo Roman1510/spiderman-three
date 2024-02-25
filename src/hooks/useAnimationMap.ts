@@ -1,50 +1,48 @@
-import { useEffect } from 'react'
+import { useRef } from 'react'
 import { useAnimations } from '@react-three/drei'
-import { AnimationAction, AnimationClip, Group } from 'three'
+import { AnimationAction, AnimationClip, Group, LoopRepeat } from 'three'
+
+type AnimationMapReturn = {
+  playAnimation: (name: string, duration?: number) => void
+}
 
 const useAnimationMap = (
   animations: AnimationClip[],
   groupRef: React.RefObject<Group>
-) => {
+): AnimationMapReturn => {
   const { actions } = useAnimations(animations, groupRef)
+  const previousActionRef = useRef<AnimationAction | null>(null)
 
-  useEffect(() => {
-    if (!animations || !groupRef.current) return
-  }, [animations, groupRef, actions])
+  const playAnimation = (name: string, duration: number = 0.1) => {
+    const currentActionName = `Armature|Armature|hero_spiderman01_S08@${name}|Base Layer`
+    const currentAction = actions[currentActionName]
 
-  const getAnimation = (
-    name: string
-  ): {
-    play: () => void
-    reset: () => void
-    stop: () => void
-    fadeIn: (duration: number) => void
-    fadeOut: (duration: number) => void
-  } => {
-    const actionName = `Armature|Armature|hero_spiderman01_S08@${name}|Base Layer`
-    const action: AnimationAction | undefined = actions[actionName] || undefined // Explicitly convert null to undefined
-
-    if (!action) {
+    if (!currentAction) {
       console.warn(`Animation ${name} not found.`)
-      return {
-        play: () => {},
-        reset: () => {},
-        stop: () => {},
-        fadeIn: (_duration: number) => {},
-        fadeOut: (_duration: number) => {},
-      }
+      return
     }
-
-    return {
-      play: () => action.play(),
-      reset: () => action.reset().play(),
-      stop: () => action.stop(),
-      fadeIn: (duration: number) => action.fadeIn(duration),
-      fadeOut: (duration: number) => action.fadeOut(duration),
+    // set the current action to loop always
+    currentAction.setLoop(LoopRepeat, Infinity)
+    if (
+      previousActionRef.current &&
+      previousActionRef.current !== currentAction
+    ) {
+      const prevAction = previousActionRef.current
+      // ensure previous action fades out to the current action
+      prevAction.enabled = true
+      currentAction.reset()
+      currentAction.play()
+      prevAction.crossFadeTo(currentAction, duration, true)
+    } else if (!previousActionRef.current) {
+      // if there's no previous action, simply play the current action
+      currentAction.reset()
+      currentAction.play()
     }
+    // update the reference to the current action as the new previous action
+    previousActionRef.current = currentAction
   }
 
-  return { getAnimation }
+  return { playAnimation }
 }
 
 export default useAnimationMap

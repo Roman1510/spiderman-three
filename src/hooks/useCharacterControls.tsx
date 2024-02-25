@@ -1,18 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { AnimationClip, Group, Vector3 } from 'three'
-import useAnimationMap from '../hooks/useAnimationMap' // Ensure this path matches your project structure
+import useAnimationMap from '../hooks/useAnimationMap' // Adjust path as necessary
 
 const useCharacterControls = (
   groupRef: React.RefObject<Group>,
   animations: AnimationClip[]
 ) => {
-  const { getAnimation } = useAnimationMap(animations, groupRef)
-  const walkAnimation = getAnimation('walk')
-  const dashAnimation = getAnimation('dash')
-  const waitAnimation = getAnimation('wait')
+  const { playAnimation } = useAnimationMap(animations, groupRef)
 
-  // Movement states
   const [moveForward, setMoveForward] = useState(false)
   const [moveBackward, setMoveBackward] = useState(false)
   const [moveLeft, setMoveLeft] = useState(false)
@@ -72,39 +68,26 @@ const useCharacterControls = (
   useFrame(() => {
     if (!groupRef.current) return
 
-    const speed = dash ? 2 : 1 // Adjust speed if dashing
+    const speed = dash ? 2 : 1 // adjust speed if dashing
     const direction = new Vector3()
 
-    if (moveForward) direction.z -= speed
-    if (moveBackward) direction.z += speed
-    if (moveLeft) direction.x -= speed
-    if (moveRight) direction.x += speed
+    if (moveForward) direction.z -= 1
+    if (moveBackward) direction.z += 1
+    if (moveLeft) direction.x -= 1
+    if (moveRight) direction.x += 1
 
-    // Normalize direction vector to have unit length, then scale by speed
+    // normalize direction vector to have unit length, then scale by speed
     direction.normalize().multiplyScalar(speed)
-
     if (direction.length() > 0) {
-      // Update character position
+      // update character position
       groupRef.current.position.add(direction)
-
-      // Rotate character to face direction of movement
+      // rotate character to face direction of movement
       groupRef.current.rotation.y = Math.atan2(direction.x, direction.z)
-
-      // Play walk or dash animation
-      if (dash) {
-        walkAnimation.stop()
-        dashAnimation.play()
-        waitAnimation.stop()
-      } else {
-        dashAnimation.stop()
-        walkAnimation.play()
-        waitAnimation.stop()
-      }
+      // play walk or dash animation based on the state
+      playAnimation(dash ? 'dash' : 'walk', 0.1)
     } else {
-      // Stop animations if not moving
-      walkAnimation.stop()
-      dashAnimation.stop()
-      waitAnimation.play()
+      // when not moving, play the wait animation
+      playAnimation('wait', 0.1)
     }
   })
 
