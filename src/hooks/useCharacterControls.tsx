@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { AnimationClip, Group, Vector3 } from 'three'
 import getAnimationsMap from '../helpers/getAnimationsMap' // Adjust path as necessary
+import { useCharacterPosition } from '../context/CharacterProvider'
 
 const useCharacterControls = (
   groupRef: React.RefObject<Group>,
   animations: AnimationClip[]
 ) => {
   const { playAnimation } = getAnimationsMap(animations, groupRef)
+  const { setPosition } = useCharacterPosition()
 
   const [moveForward, setMoveForward] = useState(false)
   const [moveBackward, setMoveBackward] = useState(false)
@@ -67,8 +69,7 @@ const useCharacterControls = (
 
   useFrame(() => {
     if (!groupRef.current) return
-
-    const speed = dash ? 2.5 : 1 // adjust speed if dashing
+    const speed = dash ? 2.5 : 1
     const direction = new Vector3()
 
     if (moveForward) direction.z -= 1
@@ -76,14 +77,14 @@ const useCharacterControls = (
     if (moveLeft) direction.x -= 1
     if (moveRight) direction.x += 1
 
-    // normalize direction vector to have unit length, then scale by speed
     direction.normalize().multiplyScalar(speed)
     if (direction.length() > 0) {
       groupRef.current.position.add(direction)
       groupRef.current.rotation.y = Math.atan2(direction.x, direction.z)
       playAnimation(dash ? 'dash' : 'walk', 0.1)
+
+      setPosition(groupRef.current.position.toArray())
     } else {
-      // when not moving, play the wait animation
       playAnimation('wait', 0.1, 2)
     }
   })
