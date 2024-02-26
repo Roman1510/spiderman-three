@@ -64,7 +64,7 @@ export default function Spiderman() {
 
   //}
   return (
-    <group scale={10} ref={group} dispose={null}>
+    <group receiveShadow scale={10} ref={group} dispose={null}>
       <group name="Sketchfab_Scene">
         <group
           name="Sketchfab_model"

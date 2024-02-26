@@ -1,8 +1,15 @@
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useMemo } from 'react'
 import { useControls } from 'leva'
 import { EffectComposer, Noise } from '@react-three/postprocessing'
-import { extend } from '@react-three/fiber'
-import { MeshStandardMaterial } from 'three'
+import { extend, useLoader } from '@react-three/fiber'
+import {
+  MeshStandardMaterial,
+  RepeatWrapping,
+  TextureLoader,
+  Vector3,
+} from 'three'
+
+import { useCharacterPosition } from '../context/CharacterProvider'
 
 extend({ MeshStandardMaterial })
 
@@ -25,16 +32,34 @@ export default function Scene({ children }: PropsWithChildren) {
       label: 'Ambient Light Intensity',
     },
     pointLightIntensity: {
-      value: 0.8,
+      value: 3,
       min: 0,
-      max: 2,
+      max: 10,
       step: 0.1,
       label: 'Point Light Intensity',
     },
-    pointLightPositionX: { value: 5, min: -10, max: 10, step: 1, label: 'X' },
-    pointLightPositionY: { value: 5, min: -10, max: 20, step: 1, label: 'Y' },
-    pointLightPositionZ: { value: 5, min: -10, max: 10, step: 1, label: 'Z' },
-    planeColor: { value: '#be9898', label: 'Plane Color' },
+    pointLightPositionX: {
+      value: 5,
+      min: -1000,
+      max: 1000,
+      step: 1,
+      label: 'X',
+    },
+    pointLightPositionY: {
+      value: 5,
+      min: 0,
+      max: 100,
+      step: 1,
+      label: 'Y',
+    },
+    pointLightPositionZ: {
+      value: 5,
+      min: -1000,
+      max: 1000,
+      step: 1,
+      label: 'Z',
+    },
+    planeColor: { value: '#c1b6b6', label: 'Plane Color' },
     planeReflectivity: {
       value: 0.5,
       min: 0,
@@ -43,7 +68,7 @@ export default function Scene({ children }: PropsWithChildren) {
       label: 'Plane Reflectivity',
     },
     noiseAmount: {
-      value: 0.02,
+      value: 0.06,
       min: 0,
       max: 0.1,
       step: 0.01,
@@ -51,28 +76,37 @@ export default function Scene({ children }: PropsWithChildren) {
     },
   })
 
+  const { position } = useCharacterPosition()
+
+  const pointLightPosition = useMemo(
+    () => new Vector3(position[0], 30, position[2]),
+    [position]
+  )
+
+  const texture = useLoader(TextureLoader, './texture.jpg')
+
+  texture.wrapS = texture.wrapT = RepeatWrapping // Enable wrapping
+  texture.repeat.set(32, 32)
   return (
     <>
       <ambientLight intensity={ambientLightIntensity} />
       <pointLight
-        position={[
-          pointLightPositionX,
-          pointLightPositionY,
-          pointLightPositionZ,
-        ]}
-        intensity={pointLightIntensity}
+        position={pointLightPosition}
+        intensity={2000}
+        distance={50}
+        decay={1.8}
       />
 
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-        <planeGeometry args={[2000, 2000]} />
+        <planeGeometry args={[3000, 3000]} />
         <meshStandardMaterial
+          map={texture}
           color={planeColor}
           metalness={planeReflectivity}
         />
       </mesh>
       {children}
 
-      {/* Post-processing effect */}
       <EffectComposer>
         <Noise opacity={noiseAmount} />
       </EffectComposer>
