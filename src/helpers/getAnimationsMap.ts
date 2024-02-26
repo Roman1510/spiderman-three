@@ -21,6 +21,7 @@ const getAnimationsMap = (
       console.warn(`Animation ${name} not found.`)
       return
     }
+
     // set the current action to loop always
     currentAction.setLoop(LoopRepeat, Infinity)
 

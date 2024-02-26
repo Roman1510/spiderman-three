@@ -1,6 +1,5 @@
 import { PropsWithChildren, useMemo } from 'react'
 import { useControls } from 'leva'
-import { EffectComposer, Noise } from '@react-three/postprocessing'
 import { extend, useLoader } from '@react-three/fiber'
 import {
   MeshStandardMaterial,
@@ -10,33 +9,44 @@ import {
 } from 'three'
 
 import { useCharacterPosition } from '../context/CharacterProvider'
+import {
+  Bloom,
+  DepthOfField,
+  EffectComposer,
+  Noise,
+  Vignette,
+} from '@react-three/postprocessing'
 
 extend({ MeshStandardMaterial })
 
 export default function Scene({ children }: PropsWithChildren) {
   const {
     ambientLightIntensity,
-    pointLightIntensity,
-    pointLightPositionX,
-    pointLightPositionY,
-    pointLightPositionZ,
     planeColor,
     planeReflectivity,
-    noiseAmount,
+    pointLightIntensity,
+    pointLightDistance,
   } = useControls('Scene settings', {
     ambientLightIntensity: {
       value: 0.5,
       min: 0,
-      max: 1,
+      max: 4,
       step: 0.1,
       label: 'Ambient Light Intensity',
     },
     pointLightIntensity: {
-      value: 3,
+      value: 6000,
       min: 0,
-      max: 10,
-      step: 0.1,
+      max: 10000,
+      step: 2,
       label: 'Point Light Intensity',
+    },
+    pointLightDistance: {
+      value: 3500,
+      min: 0,
+      max: 10000,
+      step: 2,
+      label: 'Point Light distance',
     },
     pointLightPositionX: {
       value: 5,
@@ -82,6 +92,10 @@ export default function Scene({ children }: PropsWithChildren) {
     () => new Vector3(position[0], 30, position[2]),
     [position]
   )
+  const pointLight2Position = useMemo(
+    () => new Vector3(position[0], 5, position[2] - 5),
+    [position]
+  )
 
   const texture = useLoader(TextureLoader, './texture.jpg')
 
@@ -92,9 +106,15 @@ export default function Scene({ children }: PropsWithChildren) {
       <ambientLight intensity={ambientLightIntensity} />
       <pointLight
         position={pointLightPosition}
-        intensity={2000}
-        distance={50}
+        intensity={pointLightIntensity}
+        distance={pointLightDistance}
         decay={1.8}
+      />
+      <pointLight
+        position={pointLight2Position}
+        intensity={100}
+        distance={100}
+        decay={1}
       />
 
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
@@ -107,8 +127,9 @@ export default function Scene({ children }: PropsWithChildren) {
       </mesh>
       {children}
 
-      <EffectComposer>
-        <Noise opacity={noiseAmount} />
+      <EffectComposer multisampling={0} disableNormalPass={true}>
+        <Noise opacity={0.025} />
+        <Vignette eskil={false} offset={0.4} darkness={0.5} />
       </EffectComposer>
     </>
   )

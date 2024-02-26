@@ -17,8 +17,8 @@ export const Camera: React.FC = () => {
       far: { value: 1000, min: 100, max: 5000, step: 100 },
       helper: false,
       xOffset: { value: 0, min: -100, max: 100, step: 1 },
-      yOffset: { value: 90, min: 0, max: 200, step: 1 },
-      zOffset: { value: -120, min: -500, max: 0, step: 1 },
+      yOffset: { value: 85, min: 0, max: 200, step: 1 },
+      zOffset: { value: -90, min: -500, max: 0, step: 1 },
     }
   )
 

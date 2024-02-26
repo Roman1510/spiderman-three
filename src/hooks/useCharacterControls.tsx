@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { AnimationClip, Group, Vector3 } from 'three'
+import { AnimationClip, Group, MathUtils, Vector3 } from 'three'
 import getAnimationsMap from '../helpers/getAnimationsMap' // Adjust path as necessary
 import { useCharacterPosition } from '../context/CharacterProvider'
 
@@ -16,6 +16,9 @@ const useCharacterControls = (
   const [moveLeft, setMoveLeft] = useState(false)
   const [moveRight, setMoveRight] = useState(false)
   const [dash, setDash] = useState(false)
+  const [lowAttack, setLowAttack] = useState(false)
+  const [highAttack, setHighAttack] = useState(false)
+  const [superAttack, setSuperAttack] = useState(false)
 
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.code) {
@@ -30,6 +33,15 @@ const useCharacterControls = (
         break
       case 'KeyD':
         setMoveRight(true)
+        break
+      case 'KeyJ':
+        setLowAttack(true)
+        break
+      case 'KeyI':
+        setHighAttack(true)
+        break
+      case 'KeyK':
+        setSuperAttack(true)
         break
       case 'ShiftLeft':
         setDash(true)
@@ -51,6 +63,15 @@ const useCharacterControls = (
       case 'KeyD':
         setMoveRight(false)
         break
+      case 'KeyJ':
+        setLowAttack(false)
+        break
+      case 'KeyI':
+        setHighAttack(false)
+        break
+      case 'KeyK':
+        setSuperAttack(false)
+        break
       case 'ShiftLeft':
         setDash(false)
         break
@@ -69,7 +90,8 @@ const useCharacterControls = (
 
   useFrame(() => {
     if (!groupRef.current) return
-    const speed = dash ? 2.5 : 1
+
+    const speed = dash ? 2.5 : 1.3
     const direction = new Vector3()
 
     if (moveForward) direction.z += 1
@@ -78,14 +100,39 @@ const useCharacterControls = (
     if (moveRight) direction.x -= 1
 
     direction.normalize().multiplyScalar(speed)
+
     if (direction.length() > 0) {
       groupRef.current.position.add(direction)
-      groupRef.current.rotation.y = Math.atan2(direction.x, direction.z)
-      playAnimation(dash ? 'dash' : 'walk', 0.1)
+
+      // Calculate target rotation
+      const targetRotationY = Math.atan2(direction.x, direction.z)
+
+      // Smoothly interpolate rotation
+      const rotationSpeed = 0.3 // Adjust this value to make the rotation faster or slower
+      groupRef.current.rotation.y = MathUtils.lerp(
+        groupRef.current.rotation.y,
+        targetRotationY,
+        rotationSpeed
+      )
 
       setPosition(groupRef.current.position.toArray())
-    } else {
+
+      if (!lowAttack && !highAttack && !superAttack) {
+        playAnimation(dash ? 'dash' : 'walk', 0.1)
+      }
+    } else if (!lowAttack && !highAttack && !superAttack) {
       playAnimation('wait', 0.1, 2)
+    }
+
+    if (lowAttack) {
+      playAnimation('atk-01', 0.1, 0.35)
+    }
+    if (highAttack) {
+      playAnimation('atk-02', 0.1, 0.6)
+    }
+
+    if (superAttack) {
+      playAnimation('stun', 1, 1.8)
     }
   })
 
