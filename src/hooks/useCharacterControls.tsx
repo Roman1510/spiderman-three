@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { AnimationClip, Group, MathUtils, Vector3 } from 'three'
 import getAnimationsMap from '../helpers/getAnimationsMap' // Adjust path as necessary
@@ -8,7 +8,10 @@ const useCharacterControls = (
   groupRef: React.RefObject<Group>,
   animations: AnimationClip[]
 ) => {
-  const { playAnimation } = getAnimationsMap(animations, groupRef)
+  const { playAnimation, stopAllAnimations } = getAnimationsMap(
+    animations,
+    groupRef
+  )
   const { setPosition } = useCharacterPosition()
 
   const [moveForward, setMoveForward] = useState(false)
@@ -19,6 +22,7 @@ const useCharacterControls = (
   const [lowAttack, setLowAttack] = useState(false)
   const [highAttack, setHighAttack] = useState(false)
   const [superAttack, setSuperAttack] = useState(false)
+  const [evading, setEvading] = useState(false)
 
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.code) {
@@ -42,6 +46,9 @@ const useCharacterControls = (
         break
       case 'KeyK':
         setSuperAttack(true)
+        break
+      case 'Space':
+        setEvading(true)
         break
       case 'ShiftLeft':
         setDash(true)
@@ -71,6 +78,9 @@ const useCharacterControls = (
         break
       case 'KeyK':
         setSuperAttack(false)
+        break
+      case 'Space':
+        setEvading(false)
         break
       case 'ShiftLeft':
         setDash(false)
@@ -104,11 +114,9 @@ const useCharacterControls = (
     if (direction.length() > 0) {
       groupRef.current.position.add(direction)
 
-      // Calculate target rotation
       const targetRotationY = Math.atan2(direction.x, direction.z)
 
-      // Smoothly interpolate rotation
-      const rotationSpeed = 0.3 // Adjust this value to make the rotation faster or slower
+      const rotationSpeed = 0.3
       groupRef.current.rotation.y = MathUtils.lerp(
         groupRef.current.rotation.y,
         targetRotationY,
@@ -116,23 +124,37 @@ const useCharacterControls = (
       )
 
       setPosition(groupRef.current.position.toArray())
-
-      if (!lowAttack && !highAttack && !superAttack) {
-        playAnimation(dash ? 'dash' : 'walk', 0.1)
-      }
-    } else if (!lowAttack && !highAttack && !superAttack) {
-      playAnimation('wait', 0.1, 2)
     }
 
-    if (lowAttack) {
-      playAnimation('atk-01', 0.1, 0.35)
+    const isMoving = moveForward || moveBackward || moveLeft || moveRight
+    const isAttacking = lowAttack || highAttack || superAttack || evading
+
+    if (isMoving && !isAttacking) {
+      playAnimation(dash ? 'dash' : 'walk', 0.1)
+    } else if (!isMoving && !isAttacking) {
+      playAnimation('wait', 0.1)
+    }
+
+    if (!dash) {
+      if (lowAttack) {
+        playAnimation('atk01', 0.1)
+      } else if (highAttack) {
+        playAnimation('atk02', 0.1)
+      } else if (superAttack) {
+        playAnimation('atk03', 0.1)
+      } else if (evading) {
+        const evadeDirection = new Vector3(0, 0, 1)
+          .applyQuaternion(groupRef.current.quaternion)
+          .multiplyScalar(-0.5)
+        groupRef.current.position.add(evadeDirection)
+        setPosition(groupRef.current.position.toArray())
+        playAnimation('skill02-shortversion', 0.15, 1, false)
+      }
+    } else if (dash && lowAttack) {
+      playAnimation('skill05-03', 0)
     }
     if (highAttack) {
-      playAnimation('atk-02', 0.1, 0.6)
-    }
-
-    if (superAttack) {
-      playAnimation('stun', 1, 1.8)
+      playAnimation('atk02', 0.1, 0.5, false)
     }
   })
 

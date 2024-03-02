@@ -1,6 +1,6 @@
 export const animationNames = [
-  'Armature|Armature|hero_spiderman01_S08@atk-01|Base Layer',
-  'Armature|Armature|hero_spiderman01_S08@atk-02|Base Layer',
+  'Armature|Armature|hero_spiderman01_S08@atk01|Base Layer',
+  'Armature|Armature|hero_spiderman01_S08@atk02|Base Layer',
   'Armature|Armature|hero_spiderman01_S08@dash|Base Layer',
   'Armature|Armature|hero_spiderman01_S08@die|Base Layer',
   'Armature|Armature|hero_spiderman01_S08@hit|Base Layer',
