@@ -2,14 +2,14 @@ import { useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { AnimationClip, Group, MathUtils, Vector3 } from 'three'
 import getAnimationsMap from '../helpers/getAnimationsMap' // Adjust path as necessary
-import { useCharacterPosition } from '../context/CharacterProvider'
+import { useCharacter } from '../context/CharacterProvider'
 
 const useCharacterControls = (
   groupRef: React.RefObject<Group>,
   animations: AnimationClip[]
 ) => {
   const { playAnimation } = getAnimationsMap(animations, groupRef)
-  const { setPosition, controls, setControlState } = useCharacterPosition()
+  const { setPosition, controls, setControlState } = useCharacter()
 
   const {
     moveBackward,
