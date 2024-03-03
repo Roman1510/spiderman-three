@@ -117,8 +117,8 @@ export default function Scene({ children }: PropsWithChildren) {
         decay={1}
       />
 
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-        <planeGeometry args={[3000, 3000]} />
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 0]}>
+        <boxGeometry args={[3000, 3000, 1]} />
         <meshStandardMaterial
           map={texture}
           color={planeColor}

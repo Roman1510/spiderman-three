@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { AnimationClip, Group, MathUtils, Vector3 } from 'three'
 import getAnimationsMap from '../helpers/getAnimationsMap' // Adjust path as necessary
@@ -8,7 +8,7 @@ const useCharacterControls = (
   groupRef: React.RefObject<Group>,
   animations: AnimationClip[]
 ) => {
-  const { playAnimation, stopAllAnimations } = getAnimationsMap(
+  const { playAnimation, stopAnimation } = getAnimationsMap(
     animations,
     groupRef
   )
@@ -21,8 +21,9 @@ const useCharacterControls = (
   const [dash, setDash] = useState(false)
   const [lowAttack, setLowAttack] = useState(false)
   const [highAttack, setHighAttack] = useState(false)
-  const [superAttack, setSuperAttack] = useState(false)
+
   const [evading, setEvading] = useState(false)
+  const [animationPlaying, setAnimationPlaying] = useState(false)
 
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.code) {
@@ -45,7 +46,7 @@ const useCharacterControls = (
         setHighAttack(true)
         break
       case 'KeyK':
-        setSuperAttack(true)
+        setAnimationPlaying(true)
         break
       case 'Space':
         setEvading(true)
@@ -76,9 +77,7 @@ const useCharacterControls = (
       case 'KeyI':
         setHighAttack(false)
         break
-      case 'KeyK':
-        setSuperAttack(false)
-        break
+
       case 'Space':
         setEvading(false)
         break
@@ -99,7 +98,7 @@ const useCharacterControls = (
   }, [])
 
   useFrame(() => {
-    if (!groupRef.current) return
+    if (!groupRef.current || animationPlaying) return
 
     const speed = dash ? 2.5 : 1.3
     const direction = new Vector3()
@@ -127,7 +126,7 @@ const useCharacterControls = (
     }
 
     const isMoving = moveForward || moveBackward || moveLeft || moveRight
-    const isAttacking = lowAttack || highAttack || superAttack || evading
+    const isAttacking = lowAttack || highAttack || animationPlaying || evading
 
     if (isMoving && !isAttacking) {
       playAnimation(dash ? 'dash' : 'walk', 0.1)
@@ -140,8 +139,6 @@ const useCharacterControls = (
         playAnimation('atk01', 0.1)
       } else if (highAttack) {
         playAnimation('atk02', 0.1)
-      } else if (superAttack) {
-        playAnimation('atk03', 0.1)
       } else if (evading) {
         const evadeDirection = new Vector3(0, 0, 1)
           .applyQuaternion(groupRef.current.quaternion)
@@ -157,6 +154,23 @@ const useCharacterControls = (
       playAnimation('atk02', 0.1, 0.5, false)
     }
   })
+
+  useEffect(() => {
+    console.log('timer set')
+    let timeOut: ReturnType<typeof setTimeout>
+
+    if (animationPlaying) {
+      playAnimation('skill01', 0.1, 1.9, false)
+
+      timeOut = setTimeout(() => {
+        setAnimationPlaying(false)
+      }, 2000)
+    }
+
+    return () => {
+      if (timeOut) clearTimeout(timeOut)
+    }
+  }, [animationPlaying])
 
   return {}
 }
