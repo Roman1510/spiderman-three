@@ -14,6 +14,7 @@ import { Group, SkinnedMesh, MeshPhysicalMaterial, Bone } from 'three'
 import useCharacterControls from '../hooks/useCharacterControls'
 import { useControls } from 'leva'
 import { animationNames } from '../consts/animations'
+import { useCharacter } from '../context/CharacterProvider'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -32,34 +33,14 @@ type GLTFResult = GLTF & {
   }
 }
 
-// type ActionName =
-//   | 'atk01'
-//   | 'atk02'
-//   | 'dash'
-//   | 'die'
-//   | 'hit'
-//   | 'idle'
-//   | 'skill01'
-//   | 'skill02'
-//   | 'skill03'
-//   | 'skill04'
-//   | 'skill05-01'
-//   | 'skill05-02'
-//   | 'skill05-03'
-//   | 'skill06-cam'
-//   | 'skill06'
-//   | 'stun'
-//   | 'succ_cam'
-//   | 'wait'
-//   | 'walk'
-
 export default function Spiderman(props: JSX.IntrinsicElements['group']) {
   const group = useRef<Group>(null)
   const { nodes, materials, animations } = useGLTF(
     '/new-costume.glb'
   ) as GLTFResult
   const { actions } = useAnimations(animations, group)
-
+  const { controls } = useCharacter()
+  const superAttack = controls.animationPlaying
   useCharacterControls(group, animations)
 
   //debug{
@@ -79,7 +60,6 @@ export default function Spiderman(props: JSX.IntrinsicElements['group']) {
     })
   }, [actions, timeScale])
 
-  // Adjust Leva panel controls for animations
   animationNames.forEach((fullName) => {
     const name = fullName.slice(39, 52)
     useControls('animations', {
@@ -92,55 +72,59 @@ export default function Spiderman(props: JSX.IntrinsicElements['group']) {
   })
 
   const handleAnimationPlay = (fullName: string, play: boolean) => {
-    // Stop all animations first
     Object.values(actions).forEach((action) => {
       action!.stop()
     })
 
-    // Play the selected animation
     if (play) {
       actions[fullName]?.reset().play()
     }
   }
 
   return (
-    <group receiveShadow scale={10} ref={group} {...props} dispose={null}>
-      <group name="Scene">
-        <group name="Armature" rotation={[Math.PI / 2, 0, 0]}>
-          <skinnedMesh
-            name="hero_spiderman01_s08_01"
-            geometry={nodes.hero_spiderman01_s08_01.geometry}
-            material={materials.hero_spiderman01_s08_01}
-            skeleton={nodes.hero_spiderman01_s08_01.skeleton}
-          />
-          <skinnedMesh
-            name="hero_spiderman01_s08_02"
-            geometry={nodes.hero_spiderman01_s08_02.geometry}
-            material={materials.hero_spiderman01_s08_02}
-            skeleton={nodes.hero_spiderman01_s08_02.skeleton}
-          />
-          <skinnedMesh
-            name="hero_spiderman01_s08_03"
-            geometry={nodes.hero_spiderman01_s08_03.geometry}
-            material={materials.hero_spiderman01_s08_03}
-            skeleton={nodes.hero_spiderman01_s08_03.skeleton}
-          />
-          {/* <skinnedMesh
-            name="spider_wp003"
-            geometry={nodes.spider_wp003.geometry}
-            material={materials.SpiderMan_web02}
-            skeleton={nodes.spider_wp003.skeleton}
-          />
-          <skinnedMesh
-            name="spider_wp02"
-            geometry={nodes.spider_wp02.geometry}
-            material={materials.SpiderMan_web02}
-            skeleton={nodes.spider_wp02.skeleton}
-          /> */}
-          <primitive object={nodes.hero_spiderman01_S08} />
+    <>
+      <group receiveShadow scale={10} ref={group} {...props} dispose={null}>
+        <group name="Scene">
+          <group name="Armature" rotation={[Math.PI / 2, 0, 0]}>
+            <skinnedMesh
+              name="hero_spiderman01_s08_01"
+              geometry={nodes.hero_spiderman01_s08_01.geometry}
+              material={materials.hero_spiderman01_s08_01}
+              skeleton={nodes.hero_spiderman01_s08_01.skeleton}
+            />
+            <skinnedMesh
+              name="hero_spiderman01_s08_02"
+              geometry={nodes.hero_spiderman01_s08_02.geometry}
+              material={materials.hero_spiderman01_s08_02}
+              skeleton={nodes.hero_spiderman01_s08_02.skeleton}
+            />
+            <skinnedMesh
+              name="hero_spiderman01_s08_03"
+              geometry={nodes.hero_spiderman01_s08_03.geometry}
+              material={materials.hero_spiderman01_s08_03}
+              skeleton={nodes.hero_spiderman01_s08_03.skeleton}
+            />
+            {superAttack && (
+              <>
+                <skinnedMesh
+                  name="spider_wp003"
+                  geometry={nodes.spider_wp003.geometry}
+                  material={materials.SpiderMan_web02}
+                  skeleton={nodes.spider_wp003.skeleton}
+                />
+                <skinnedMesh
+                  name="spider_wp02"
+                  geometry={nodes.spider_wp02.geometry}
+                  material={materials.SpiderMan_web02}
+                  skeleton={nodes.spider_wp02.skeleton}
+                />
+              </>
+            )}
+            <primitive object={nodes.hero_spiderman01_S08} />
+          </group>
         </group>
       </group>
-    </group>
+    </>
   )
 }
 

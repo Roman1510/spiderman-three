@@ -8,18 +8,14 @@ import {
   Vector3,
 } from 'three'
 
-import { useCharacterPosition } from '../context/CharacterProvider'
-import {
-  Bloom,
-  DepthOfField,
-  EffectComposer,
-  Noise,
-  Vignette,
-} from '@react-three/postprocessing'
+import { useCharacter } from '../context/CharacterProvider'
+
+import { EffectComposer, Noise, Vignette } from '@react-three/postprocessing'
 
 extend({ MeshStandardMaterial })
 
 export default function Scene({ children }: PropsWithChildren) {
+  const { position } = useCharacter()
   const {
     ambientLightIntensity,
     planeColor,
@@ -80,13 +76,11 @@ export default function Scene({ children }: PropsWithChildren) {
     noiseAmount: {
       value: 0.06,
       min: 0,
-      max: 0.1,
+      max: 0.3,
       step: 0.01,
       label: 'Noise Amount',
     },
   })
-
-  const { position } = useCharacterPosition()
 
   const pointLightPosition = useMemo(
     () => new Vector3(position[0], 30, position[2]),
@@ -128,7 +122,7 @@ export default function Scene({ children }: PropsWithChildren) {
       {children}
 
       <EffectComposer multisampling={0} disableNormalPass={true}>
-        <Noise opacity={0.025} />
+        <Noise opacity={0.045} />
         <Vignette eskil={false} offset={0.4} darkness={0.5} />
       </EffectComposer>
     </>

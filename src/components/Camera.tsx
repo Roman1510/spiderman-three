@@ -1,15 +1,14 @@
 import { useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { useCharacterPosition } from '../context/CharacterProvider'
+import { useCharacter } from '../context/CharacterProvider'
 import { PerspectiveCamera } from '@react-three/drei'
 import { useControls } from 'leva'
 import { CameraHelper, PerspectiveCamera as PerspectiveCameraType } from 'three'
 
 export const Camera: React.FC = () => {
-  const { position } = useCharacterPosition()
+  const { position } = useCharacter()
   const { camera, scene } = useThree()
 
-  // Integrating xOffset, yOffset, zOffset into Leva for real-time adjustments
   const { near, far, helper, xOffset, yOffset, zOffset } = useControls(
     'Camera',
     {

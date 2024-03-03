@@ -34,7 +34,6 @@ function App() {
                 <meshStandardMaterial color={'orange'} />
               </mesh>
             </Float>
-
             <Spiderman />
           </Scene>
           <PerformanceMonitor perfMonitor />
