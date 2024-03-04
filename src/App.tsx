@@ -3,11 +3,13 @@ import Spiderman from './components/Spiderman'
 import Scene from './components/Scene'
 import { CharacterProvider } from './context/CharacterProvider'
 import { Float } from '@react-three/drei'
-import { PerformanceMonitor } from './components/PerformanceMonitor'
+import JoypadButtons from './components/JoypadButtons'
+import { Leva } from 'leva'
 function App() {
   return (
     <div id="canvas-container">
       <CharacterProvider>
+        <JoypadButtons />
         <Canvas>
           <Scene>
             <Float>
@@ -36,7 +38,8 @@ function App() {
             </Float>
             <Spiderman />
           </Scene>
-          <PerformanceMonitor perfMonitor />
+          <Leva collapsed hidden={true} />
+          {/* <PerformanceMonitor perfMonitor/> */}
         </Canvas>
       </CharacterProvider>
     </div>

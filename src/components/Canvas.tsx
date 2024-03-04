@@ -83,7 +83,7 @@ const Canvas = ({ children }: PropsWithChildren) => {
     }
   }, [])
   return (
-    <CanvasThree shadows>
+    <CanvasThree dpr={2} shadows>
       <Camera />
       <OrbitControls ref={orbitControlsRef} />
       {children}
