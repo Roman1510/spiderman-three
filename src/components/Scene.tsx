@@ -94,7 +94,7 @@ export default function Scene({ children }: PropsWithChildren) {
   const texture = useLoader(TextureLoader, './texture.jpg')
 
   texture.wrapS = texture.wrapT = RepeatWrapping // Enable wrapping
-  texture.repeat.set(32, 32)
+  texture.repeat.set(10, 10)
   return (
     <>
       <ambientLight intensity={ambientLightIntensity} />

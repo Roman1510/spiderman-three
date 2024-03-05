@@ -23,10 +23,11 @@ const useCharacterControls = (
     animationPlaying,
   } = controls
 
-  useFrame(() => {
+  useFrame((_state, delta) => {
     if (!groupRef.current || animationPlaying) return
 
-    const speed = dash ? 2.5 : 1.3
+    const baseSpeed = dash ? 2.5 : 1.3
+    const speed = baseSpeed * delta * 40
     const direction = new Vector3()
 
     if (moveForward) direction.z += 1

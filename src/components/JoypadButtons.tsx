@@ -23,23 +23,37 @@ const ButtonContainer = styled.div`
   gap: 10px;
 `
 
-// Styled-component for individual buttons
-const Button = styled.button<{ large?: boolean }>`
+// Styled-component for individual buttons, with an added prop for vertical offset
+const Button = styled.button<{ large?: boolean; yOffset?: number }>`
   width: ${({ large }) => (large ? '80px' : '60px')};
   height: ${({ large }) => (large ? '80px' : '60px')};
+  opacity: 0.6;
   border-radius: 50%;
   font-size: 12px;
-  background-color: #f0f0f0;
+  background-color: rgba(
+    240,
+    240,
+    240,
+    0.8
+  ); // Making background slightly transparent
   border: none;
   display: flex;
   justify-content: center;
   align-items: center;
   touch-action: manipulation;
   user-select: none;
+  position: relative; // Allow for absolute positioning
+  top: ${({ yOffset }) =>
+    yOffset
+      ? `${-yOffset}px`
+      : '0'}; // Adjust vertical position based on yOffset prop
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19); // Adding some shadow for the 3D effect
   &:active {
     background-color: #e0e0e0; /* Slightly darker on press for feedback */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); // Adjust shadow for pressed effect
   }
 `
+
 const JoypadButtons = () => {
   const { setControlState } = useCharacter()
 
@@ -67,6 +81,10 @@ const JoypadButtons = () => {
   }
   const onReleaseD = () => {
     setControlState('evading', false)
+  }
+
+  const onS = () => {
+    setControlState('animationPlaying', true)
   }
 
   const clearMovement = () => {
@@ -175,6 +193,9 @@ const JoypadButtons = () => {
               Dodge
             </Button>
           </div>
+          <Button yOffset={250} id="button-s" onPointerDown={onS}>
+            S
+          </Button>
         </ButtonContainer>
       </ControlsContainer>
     </>
