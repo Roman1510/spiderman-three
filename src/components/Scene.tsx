@@ -11,6 +11,7 @@ import {
 import { useCharacter } from '../context/CharacterProvider'
 
 import { EffectComposer, Noise, Vignette } from '@react-three/postprocessing'
+import { Zombie3 } from './Zombie3'
 
 extend({ MeshStandardMaterial })
 
@@ -120,7 +121,20 @@ export default function Scene({ children }: PropsWithChildren) {
         />
       </mesh>
       {children}
-
+      <Zombie3
+        key={'zombie2'}
+        name="zombie2"
+        scale={0.09}
+        rotation={[0, -Math.PI / 2, 0]}
+        position={[20, 0, 0]}
+      />
+      <Zombie3
+        key={'zombie1'}
+        name="zombie1"
+        scale={0.09}
+        rotation={[0, -Math.PI / 2, 0]}
+        position={[20, 0, 10]}
+      />
       <EffectComposer multisampling={0} disableNormalPass={true}>
         <Noise opacity={0.045} />
         <Vignette eskil={false} offset={0.4} darkness={0.5} />
