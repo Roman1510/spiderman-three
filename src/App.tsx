@@ -2,8 +2,10 @@ import Canvas from './components/Canvas'
 import Spiderman from './components/Spiderman'
 import Scene from './components/Scene'
 import { CharacterProvider } from './context/CharacterProvider'
-import { Float } from '@react-three/drei'
 import JoypadButtons from './components/JoypadButtons'
+import { Zombie } from './components/Zombie'
+import { Zombie2 } from './components/Zombie2'
+
 // import { Leva } from 'leva'
 function App() {
   return (
@@ -12,31 +14,20 @@ function App() {
         <JoypadButtons />
         <Canvas>
           <Scene>
-            <Float>
-              <mesh scale={10} position={[80, 25, 130]}>
-                <boxGeometry args={[1, 1, 1]} />
-                <meshNormalMaterial />
-              </mesh>
-            </Float>
-            <Float>
-              <mesh scale={10} position={[180, 30, 230]}>
-                <boxGeometry args={[1, 1, 1]} />
-                <meshStandardMaterial color={'orange'} />
-              </mesh>
-            </Float>
-            <Float>
-              <mesh scale={10} position={[-80, 35, 130]}>
-                <boxGeometry args={[1, 1, 1]} />
-                <meshStandardMaterial color={'hotpink'} />
-              </mesh>
-            </Float>
-            <Float>
-              <mesh scale={10} position={[-180, 20, 230]}>
-                <boxGeometry args={[1, 1, 1]} />
-                <meshStandardMaterial color={'orange'} />
-              </mesh>
-            </Float>
             <Spiderman />
+
+            <Zombie
+              key="zombie1"
+              rotation={[0, Math.PI / 2, 0]}
+              scale={10}
+              position={[-30, 0, 40]}
+            />
+            <Zombie
+              key="zombie2"
+              rotation={[0, -Math.PI / 2, 0]}
+              scale={10}
+              position={[30, 0, 40]}
+            />
           </Scene>
           {/* <Leva collapsed hidden={false} /> */}
           {/* <PerformanceMonitor perfMonitor/> */}

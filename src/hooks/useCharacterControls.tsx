@@ -69,7 +69,7 @@ const useCharacterControls = (
       } else if (evading) {
         const evadeDirection = new Vector3(0, 0, 1)
           .applyQuaternion(groupRef.current.quaternion)
-          .multiplyScalar(-0.5)
+          .multiplyScalar(-0.23)
         groupRef.current.position.add(evadeDirection)
         setPosition(groupRef.current.position.toArray())
         playAnimation('skill02-shortversion', 0.15, 1, false)
