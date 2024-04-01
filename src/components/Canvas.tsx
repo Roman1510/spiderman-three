@@ -1,4 +1,4 @@
-import { useRef, PropsWithChildren, useEffect } from 'react'
+import { useRef, PropsWithChildren, useEffect, useState } from 'react'
 import { Canvas as CanvasThree } from '@react-three/fiber'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { OrbitControls } from '@react-three/drei'
@@ -7,24 +7,31 @@ import { useCharacter } from '../context/CharacterProvider'
 
 const Canvas = ({ children }: PropsWithChildren) => {
   const orbitControlsRef = useRef<OrbitControlsImpl>(null)
-  const { setControlState } = useCharacter()
+  const { setControlState, setDirection } = useCharacter()
+
+  const [pressedKeys, setPressedKeys] = useState({
+    KeyW: false,
+    KeyA: false,
+    KeyS: false,
+    KeyD: false,
+  })
+
+  const updateDirection = () => {
+    const direction: [number, number, number] = [0, 0, 0]
+    if (pressedKeys.KeyW) direction[2] += 1
+    if (pressedKeys.KeyS) direction[2] -= 1
+    if (pressedKeys.KeyA) direction[0] += 1
+    if (pressedKeys.KeyD) direction[0] -= 1
+
+    setDirection(direction)
+  }
 
   const onKeyDown = (event: KeyboardEvent) => {
+    if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) {
+      setPressedKeys((prev) => ({ ...prev, [event.code]: true }))
+    }
+
     switch (event.code) {
-      case 'KeyW':
-        setControlState('moveForward', true)
-
-        break
-      case 'KeyA':
-        setControlState('moveLeft', true)
-
-        break
-      case 'KeyS':
-        setControlState('moveBackward', true)
-        break
-      case 'KeyD':
-        setControlState('moveRight', true)
-        break
       case 'KeyJ':
         setControlState('lowAttack', true)
         break
@@ -44,19 +51,11 @@ const Canvas = ({ children }: PropsWithChildren) => {
   }
 
   const onKeyUp = (event: KeyboardEvent) => {
+    if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) {
+      setPressedKeys((prev) => ({ ...prev, [event.code]: false }))
+    }
+
     switch (event.code) {
-      case 'KeyW':
-        setControlState('moveForward', false)
-        break
-      case 'KeyA':
-        setControlState('moveLeft', false)
-        break
-      case 'KeyS':
-        setControlState('moveBackward', false)
-        break
-      case 'KeyD':
-        setControlState('moveRight', false)
-        break
       case 'KeyJ':
         setControlState('lowAttack', false)
         break
@@ -74,6 +73,8 @@ const Canvas = ({ children }: PropsWithChildren) => {
   }
 
   useEffect(() => {
+    updateDirection()
+
     document.addEventListener('keydown', onKeyDown)
     document.addEventListener('keyup', onKeyUp)
 
@@ -81,7 +82,7 @@ const Canvas = ({ children }: PropsWithChildren) => {
       document.removeEventListener('keydown', onKeyDown)
       document.removeEventListener('keyup', onKeyUp)
     }
-  }, [])
+  }, [pressedKeys])
   return (
     <CanvasThree dpr={2} shadows>
       <Camera />

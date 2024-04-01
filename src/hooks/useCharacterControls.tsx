@@ -42,8 +42,7 @@ const useCharacterControls = (
         targetRotation
       )
 
-      // Smoothly interpolate the current rotation towards the target rotation
-      groupRef.current.quaternion.slerp(quaternionTarget, 0.1)
+      groupRef.current.quaternion.slerp(quaternionTarget, 0.15)
 
       setPosition(groupRef.current.position.toArray())
     }
