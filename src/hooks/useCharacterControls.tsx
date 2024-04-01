@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { AnimationClip, Group, MathUtils, Quaternion, Vector3 } from 'three'
+import { AnimationClip, Group, Quaternion, Vector3 } from 'three'
 import getAnimationsMap from '../helpers/getAnimationsMap' // Adjust path as necessary
 import { useCharacter } from '../context/CharacterProvider'
 
