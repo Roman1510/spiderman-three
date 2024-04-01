@@ -4,7 +4,6 @@ import Scene from './components/Scene'
 import { CharacterProvider } from './context/CharacterProvider'
 import JoypadButtons from './components/JoypadButtons'
 import { Zombie } from './components/Zombie'
-import { Zombie2 } from './components/Zombie2'
 
 // import { Leva } from 'leva'
 function App() {

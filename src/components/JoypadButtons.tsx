@@ -3,7 +3,6 @@ import { useCharacter } from '../context/CharacterProvider'
 import { Joystick } from 'react-joystick-component'
 import { IJoystickUpdateEvent } from 'react-joystick-component/build/lib/Joystick'
 
-// Styled-components for the parent container
 const ControlsContainer = styled.div`
   position: fixed;
   bottom: 20px;
@@ -15,7 +14,6 @@ const ControlsContainer = styled.div`
   z-index: 100000;
 `
 
-// Styled-components for the button container
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -23,34 +21,25 @@ const ButtonContainer = styled.div`
   gap: 10px;
 `
 
-// Styled-component for individual buttons, with an added prop for vertical offset
 const Button = styled.button<{ large?: boolean; yOffset?: number }>`
   width: ${({ large }) => (large ? '80px' : '60px')};
   height: ${({ large }) => (large ? '80px' : '60px')};
   opacity: 0.6;
   border-radius: 50%;
   font-size: 12px;
-  background-color: rgba(
-    240,
-    240,
-    240,
-    0.8
-  ); // Making background slightly transparent
+  background-color: rgba(240, 240, 240, 0.8);
   border: none;
   display: flex;
   justify-content: center;
   align-items: center;
   touch-action: manipulation;
   user-select: none;
-  position: relative; // Allow for absolute positioning
-  top: ${({ yOffset }) =>
-    yOffset
-      ? `${-yOffset}px`
-      : '0'}; // Adjust vertical position based on yOffset prop
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19); // Adding some shadow for the 3D effect
+  position: relative;
+  top: ${({ yOffset }) => (yOffset ? `${-yOffset}px` : '0')};
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
   &:active {
-    background-color: #e0e0e0; /* Slightly darker on press for feedback */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); // Adjust shadow for pressed effect
+    background-color: #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 `
 

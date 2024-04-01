@@ -11,7 +11,6 @@ import {
 import { useCharacter } from '../context/CharacterProvider'
 
 import { EffectComposer, Noise, Vignette } from '@react-three/postprocessing'
-import { Zombie3 } from './Zombie3'
 
 extend({ MeshStandardMaterial })
 
