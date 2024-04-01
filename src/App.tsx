@@ -4,17 +4,18 @@ import Scene from './components/Scene'
 import { CharacterProvider } from './context/CharacterProvider'
 import JoypadButtons from './components/JoypadButtons'
 import { Zombie } from './components/Zombie'
+import { useIsMobile } from './hooks/useIsMobile'
 
-// import { Leva } from 'leva'
 function App() {
+  const isMobile = true || useIsMobile()
+
   return (
     <div id="canvas-container">
       <CharacterProvider>
-        <JoypadButtons />
+        {isMobile && <JoypadButtons />}
         <Canvas>
           <Scene>
             <Spiderman />
-
             <Zombie
               key="zombie1"
               rotation={[0, Math.PI / 2, 0]}
@@ -28,7 +29,6 @@ function App() {
               position={[30, 0, 40]}
             />
           </Scene>
-          {/* <Leva collapsed hidden={false} /> */}
           {/* <PerformanceMonitor perfMonitor/> */}
         </Canvas>
       </CharacterProvider>

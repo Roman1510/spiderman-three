@@ -44,7 +44,7 @@ const Button = styled.button<{ large?: boolean; yOffset?: number }>`
 `
 
 const JoypadButtons = () => {
-  const { setControlState } = useCharacter()
+  const { setControlState, setDirection } = useCharacter()
 
   const onA = () => {
     setControlState('dash', true)
@@ -76,68 +76,16 @@ const JoypadButtons = () => {
     setControlState('animationPlaying', true)
   }
 
-  const clearMovement = () => {
-    setControlState('moveForward', false)
-    setControlState('moveBackward', false)
-    setControlState('moveLeft', false)
-    setControlState('moveRight', false)
-  }
-
   const handleMove = (event: IJoystickUpdateEvent) => {
-    // First, clear any existing movement states to avoid conflicts.
-    clearMovement()
+    const x = event.x ?? 0
+    const y = event.y ?? 0
 
-    // Straight movement handling using event.direction.
-    switch (event.direction) {
-      case 'FORWARD':
-        setControlState('moveForward', true)
-        break
-      case 'BACKWARD':
-        setControlState('moveBackward', true)
-        break
-      case 'LEFT':
-        setControlState('moveLeft', true)
-        break
-      case 'RIGHT':
-        setControlState('moveRight', true)
-        break
-      default:
-        break // No action for undefined or diagonal through this method.
-    }
-
-    // Diagonal movement handling using x and y values.
-    // Assuming `x` and `y` are normalized between -1 (left or down) and 1 (right or up).
-    const x = event.x // Horizontal axis: left (<0) and right (>0)
-    const y = event.y // Vertical axis: down (<0) and up (>0)
-
-    // Threshold to determine significant movement for diagonals.
-    const threshold = 0.5 // Adjust based on sensitivity preference.
-
-    // Check for diagonal movement by combining axis values.
-    if (Math.abs(x!) > threshold && Math.abs(y!) > threshold) {
-      // Diagonal movement detected. Adjust states as needed.
-      if (x! > 0 && y! > 0) {
-        // Diagonal up-right.
-        setControlState('moveForward', true)
-        setControlState('moveRight', true)
-      } else if (x! > 0 && y! < 0) {
-        // Diagonal down-right.
-        setControlState('moveBackward', true)
-        setControlState('moveRight', true)
-      } else if (x! < 0 && y! > 0) {
-        // Diagonal up-left.
-        setControlState('moveForward', true)
-        setControlState('moveLeft', true)
-      } else if (x! < 0 && y! < 0) {
-        // Diagonal down-left.
-        setControlState('moveBackward', true)
-        setControlState('moveLeft', true)
-      }
-    }
+    const directionVector: [number, number, number] = [-x, 0, y]
+    setDirection(directionVector)
   }
 
   const handleStop = () => {
-    clearMovement() // Clear any movement when the joystick is released
+    setDirection([0, 0, 0])
   }
   return (
     <>

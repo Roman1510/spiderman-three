@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { AnimationClip, Group, MathUtils, Vector3 } from 'three'
+import { AnimationClip, Group, MathUtils, Quaternion, Vector3 } from 'three'
 import getAnimationsMap from '../helpers/getAnimationsMap' // Adjust path as necessary
 import { useCharacter } from '../context/CharacterProvider'
 
@@ -12,10 +12,7 @@ const useCharacterControls = (
   const { setPosition, controls, setControlState } = useCharacter()
 
   const {
-    moveBackward,
-    moveForward,
-    moveLeft,
-    moveRight,
+    directionVector,
     dash,
     lowAttack,
     highAttack,
@@ -28,31 +25,30 @@ const useCharacterControls = (
 
     const baseSpeed = dash ? 2.5 : 1.3
     const speed = baseSpeed * delta * 40
-    const direction = new Vector3()
-
-    if (moveForward) direction.z += 1
-    if (moveBackward) direction.z -= 1
-    if (moveLeft) direction.x += 1
-    if (moveRight) direction.x -= 1
+    const direction = new Vector3(...directionVector)
 
     direction.normalize().multiplyScalar(speed)
 
     if (direction.length() > 0) {
       groupRef.current.position.add(direction)
 
-      const targetRotationY = Math.atan2(direction.x, direction.z)
-
-      const rotationSpeed = 0.3
-      groupRef.current.rotation.y = MathUtils.lerp(
-        groupRef.current.rotation.y,
-        targetRotationY,
-        rotationSpeed
+      const targetRotation = new Vector3(
+        direction.x,
+        0,
+        direction.z
+      ).normalize()
+      const quaternionTarget = new Quaternion().setFromUnitVectors(
+        new Vector3(0, 0, 1),
+        targetRotation
       )
+
+      // Smoothly interpolate the current rotation towards the target rotation
+      groupRef.current.quaternion.slerp(quaternionTarget, 0.1)
 
       setPosition(groupRef.current.position.toArray())
     }
 
-    const isMoving = moveForward || moveBackward || moveLeft || moveRight
+    const isMoving = directionVector.some((component) => component !== 0)
     const isAttacking = lowAttack || highAttack || animationPlaying || evading
 
     if (isMoving && !isAttacking) {
@@ -83,7 +79,6 @@ const useCharacterControls = (
   })
 
   useEffect(() => {
-    console.log('timer set')
     let timeOut: ReturnType<typeof setTimeout>
 
     if (animationPlaying) {
@@ -97,7 +92,7 @@ const useCharacterControls = (
     return () => {
       if (timeOut) clearTimeout(timeOut)
     }
-  }, [animationPlaying])
+  }, [animationPlaying, playAnimation, setControlState])
 
   return {}
 }

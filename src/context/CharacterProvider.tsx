@@ -6,10 +6,7 @@ import React, {
 } from 'react'
 
 export interface CharacterControls {
-  moveForward: boolean
-  moveBackward: boolean
-  moveLeft: boolean
-  moveRight: boolean
+  directionVector: [number, number, number]
   dash: boolean
   lowAttack: boolean
   highAttack: boolean
@@ -22,6 +19,8 @@ export type CharacterContextType = {
 
   controls: CharacterControls
   setControlState: (control: keyof CharacterControls, state: boolean) => void
+
+  setDirection: (newDirection: [number, number, number]) => void
 }
 
 const CharacterContext = createContext<CharacterContextType | undefined>(
@@ -31,10 +30,7 @@ const CharacterContext = createContext<CharacterContextType | undefined>(
 export const CharacterProvider = ({ children }: PropsWithChildren<{}>) => {
   const [position, setPosition] = useState<number[]>([0, 0, 0])
   const [controls, setControls] = useState<CharacterControls>({
-    moveForward: false,
-    moveBackward: false,
-    moveLeft: false,
-    moveRight: false,
+    directionVector: [0, 0, 0],
     dash: false,
     lowAttack: false,
     highAttack: false,
@@ -44,14 +40,21 @@ export const CharacterProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const setControlState = (
     control: keyof CharacterControls,
-    state: boolean
+    state: boolean | [number, number, number]
   ) => {
     setControls((prev) => ({ ...prev, [control]: state }))
   }
 
+  const setDirection = (newDirection: [number, number, number]) => {
+    setControls((prevControls) => ({
+      ...prevControls,
+      directionVector: newDirection,
+    }))
+  }
+
   return (
     <CharacterContext.Provider
-      value={{ position, setPosition, controls, setControlState }}
+      value={{ position, setPosition, controls, setControlState, setDirection }}
     >
       {children}
     </CharacterContext.Provider>

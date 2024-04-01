@@ -1,5 +1,5 @@
 import { PropsWithChildren, useMemo } from 'react'
-import { useControls } from 'leva'
+import { Leva, useControls } from 'leva'
 import { extend, useLoader } from '@react-three/fiber'
 import {
   MeshStandardMaterial,
@@ -125,6 +125,7 @@ export default function Scene({ children }: PropsWithChildren) {
         <Noise opacity={0.045} />
         <Vignette eskil={false} offset={0.4} darkness={0.5} />
       </EffectComposer>
+      <Leva collapsed hidden={true} />
     </>
   )
 }
