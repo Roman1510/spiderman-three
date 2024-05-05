@@ -2,6 +2,7 @@ import React, {
   PropsWithChildren,
   createContext,
   useContext,
+  useEffect,
   useState,
 } from 'react'
 
@@ -29,6 +30,7 @@ const CharacterContext = createContext<CharacterContextType | undefined>(
 
 export const CharacterProvider = ({ children }: PropsWithChildren<{}>) => {
   const [position, setPosition] = useState<number[]>([0, 0, 0])
+  const [positionChanged, setPositionChanged] = useState(false)
   const [controls, setControls] = useState<CharacterControls>({
     directionVector: [0, 0, 0],
     dash: false,
@@ -51,6 +53,19 @@ export const CharacterProvider = ({ children }: PropsWithChildren<{}>) => {
       directionVector: newDirection,
     }))
   }
+
+  useEffect(() => {
+    setPositionChanged(true)
+  }, [position])
+
+  useEffect(() => {
+    const music = new Audio('/Music_Reverb.mp3')
+    music.loop = true
+
+    music.play().catch((error) => {
+      console.error('Audio playback failed:', error)
+    })
+  }, [positionChanged])
 
   return (
     <CharacterContext.Provider

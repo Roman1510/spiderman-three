@@ -79,9 +79,9 @@ const useCharacterControls = (
 
   useEffect(() => {
     let timeOut: ReturnType<typeof setTimeout>
-
+    console.log('useeffect, animationPlaying:', animationPlaying)
     if (animationPlaying) {
-      playAnimation('skill01', 0.1, 1.9, false)
+      playAnimation('skill01', 0, 2.1, false)
 
       timeOut = setTimeout(() => {
         setControlState('animationPlaying', false)
@@ -91,7 +91,7 @@ const useCharacterControls = (
     return () => {
       if (timeOut) clearTimeout(timeOut)
     }
-  }, [animationPlaying, playAnimation, setControlState])
+  }, [animationPlaying])
 
   return {}
 }

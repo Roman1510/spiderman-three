@@ -87,6 +87,7 @@ const JoypadButtons = () => {
   const handleStop = () => {
     setDirection([0, 0, 0])
   }
+
   return (
     <>
       <ControlsContainer>

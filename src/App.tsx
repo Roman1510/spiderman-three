@@ -5,18 +5,9 @@ import { CharacterProvider } from './context/CharacterProvider'
 import JoypadButtons from './components/JoypadButtons'
 import { Zombie } from './components/Zombie'
 import { useIsMobile } from './hooks/useIsMobile'
-import { useEffect } from 'react'
 
 function App() {
-  const isMobile = true || useIsMobile()
-
-  useEffect(() => {
-    const music = new Audio('/Music_Reverb.mp3')
-    music.loop = true
-    music.play()
-
-    return () => music.pause()
-  }, [])
+  const isMobile = useIsMobile()
 
   return (
     <div id="canvas-container">
